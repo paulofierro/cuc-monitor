@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Logger",
+        "repositoryURL": "https://github.com/paulofierro/Logger",
+        "state": {
+          "branch": null,
+          "revision": "05f7a9b332e468816703fa4b37861fd33d3f57b1",
+          "version": "0.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
