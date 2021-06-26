@@ -62,6 +62,22 @@ final class NetworkManager {
             }
         }
     }
+    
+    func loadData(meterId: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
+        let url = baseURL.appendingPathComponent(usagePath)
+        let data = UsageDataRequest(meterId: meterId).toData()
+        let request = URLRequest.postRequest(url: url, data: data)
+        
+        makeRequest(request) { result in
+            switch result {
+            case .success:
+                completionHandler(.success(()))
+                
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
 }
 
 extension NetworkManager {
