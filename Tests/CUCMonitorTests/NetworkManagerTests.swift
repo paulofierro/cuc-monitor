@@ -8,7 +8,7 @@ final class NetworkManagerTests: XCTestCase {
     let password = ""
     
     func testLogin() throws {
-        let expectation = XCTestExpectation(description: "Login")
+        let loginExpectation = XCTestExpectation(description: "Login")
         var url: String?
         
         networkManager.login(
@@ -23,11 +23,33 @@ final class NetworkManagerTests: XCTestCase {
                     log.error("Error: \(error)")
                 }
             
-                expectation.fulfill()
+                loginExpectation.fulfill()
             }
         )
         
-        wait(for: [expectation], timeout: 10)
-        XCTAssertNotNil(url)
+        wait(for: [loginExpectation], timeout: 10)
+        let redirectURL = try XCTUnwrap(url)
+        XCTAssertNotNil(redirectURL)
+    
+        let redirectExpectation = XCTestExpectation(description: "Redirect")
+        var success = false
+        
+        networkManager.loadRedirect(
+            redirectURL: redirectURL,
+            completionHandler: { result in
+                switch result {
+                case .success:
+                    success = true
+                    
+                case .failure(let error):
+                    log.error("Error: \(error)")
+                }
+            
+                redirectExpectation.fulfill()
+            }
+        )
+        
+        wait(for: [redirectExpectation], timeout: 10)
+        XCTAssertTrue(success)
     }
 }

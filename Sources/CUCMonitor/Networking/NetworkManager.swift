@@ -7,26 +7,17 @@
 
 import Foundation
 
-class NetworkManager {
+final class NetworkManager {
     
-    private let baseURL = URL(string: "https://cucconnect.cuc.ky/HomeConnect/Controller/")!
-    private let loginPath = "Login"
-    private let usagePath = "Usage"
+    private let baseURL = URL(string: "https://cucconnect.cuc.ky/HomeConnect")!
+    private let loginPath = "Controller/Login"
+    private let usagePath = "Controller/Usage"
     
     private lazy var session: URLSession = {
         URLSession(configuration: URLSessionConfiguration.ephemeral)
     }()
     
     func getData() {
-//        login { result in
-//            switch result {
-//            case .success(let redirectURL):
-//                log.debug("Redirect: \(redirectURL)")
-//                
-//            case .failure(let error):
-//                log.error("Error: \(error)")
-//            }
-//        }
     }
     
     /// Returns the URL to redirect to
@@ -40,7 +31,43 @@ class NetworkManager {
             "ajax": "true",
         ]
         request.httpBody = params.queryParameters.data(using: .utf8, allowLossyConversion: true)
+        makeRequest(request) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let result = try JSONDecoder().decode(LoginResult.self, from: data)
+                    completionHandler(.success(result.redirectUrl))
+                } catch {
+                    completionHandler(.failure(error))
+                }
+                
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+    
+    /// Loads the redirect page to finalize the login
+    func loadRedirect(redirectURL: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
+        let url = baseURL.appendingPathComponent(redirectURL)
+        let request = URLRequest.postRequest(url: url)
         
+        makeRequest(request) { result in
+            switch result {
+            case .success:
+                completionHandler(.success(()))
+                
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+}
+
+extension NetworkManager {
+    
+    /// Makes a request and returns the loaded data (or the error if there is one)
+    private func makeRequest(_ request: URLRequest, completionHandler: @escaping(Result<Data, Error>) -> Void) {
         session.dataTask(
             with: request,
             completionHandler:  { data, response, error in
@@ -54,18 +81,10 @@ class NetworkManager {
                     return
                 }
                 
-                do {
-                    let result = try JSONDecoder().decode(LoginResult.self, from: data)
-                    completionHandler(.success(result.redirectUrl))
-                } catch {
-                    completionHandler(.failure(error))
-                }
+                completionHandler(.success(data))
             }
         ).resume()
     }
-}
-
-extension NetworkManager {
     
     /// Checks for returned errors and then looks for HTTP error codes.
     private func checkForErrors(response: URLResponse?, error: Error?) -> Error? {
