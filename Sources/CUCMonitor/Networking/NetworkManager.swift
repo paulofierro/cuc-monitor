@@ -11,6 +11,7 @@ final class NetworkManager {
     
     private let baseURL = URL(string: "https://cucconnect.cuc.ky/HomeConnect")!
     private let loginPath = "Controller/Login"
+    private let meterPath = "Controller/GetMyProgressDefaultData"
     private let usagePath = "Controller/Usage"
     
     private lazy var session: URLSession = {
@@ -21,10 +22,10 @@ final class NetworkManager {
     }
     
     /// Returns the URL to redirect to
-    func login(username: String, password: String, completionHandler: @escaping(Result<String, Error>) -> Void) {
+    internal func login(username: String, password: String, completionHandler: @escaping(Result<String, Error>) -> Void) {
         let url = baseURL.appendingPathComponent(loginPath)
         
-        var request = URLRequest.postRequest(url: url)
+        var request = URLRequest.POST(url: url)
         let params = [
             "username": username,
             "password": password,
@@ -48,9 +49,9 @@ final class NetworkManager {
     }
     
     /// Loads the redirect page to finalize the login
-    func loadRedirect(redirectURL: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
+    internal func loadRedirect(redirectURL: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
         let url = baseURL.appendingPathComponent(redirectURL)
-        let request = URLRequest.postRequest(url: url)
+        let request = URLRequest.POST(url: url)
         
         makeRequest(request) { result in
             switch result {
@@ -63,10 +64,31 @@ final class NetworkManager {
         }
     }
     
-    func loadData(meterId: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
+    /// Loads the meter ID
+    internal func findMeterId(completionHandler: @escaping(Result<String, Error>) -> Void) {
+        let url = baseURL.appendingPathComponent(meterPath)
+        let request = URLRequest.GET(url: url, parameters: ["forceInitialCommodityTp": "E"])
+        
+        makeRequest(request) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let result = try JSONDecoder().decode(MeterResult.self, from: data)
+                    completionHandler(.success(result.meterId))
+                } catch {
+                    completionHandler(.failure(error))
+                }
+                
+            case .failure(let error):
+                completionHandler(.failure(error))
+            }
+        }
+    }
+    
+    internal func loadData(meterId: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
         let url = baseURL.appendingPathComponent(usagePath)
         let data = UsageDataRequest(meterId: meterId).toData()
-        let request = URLRequest.postRequest(url: url, data: data)
+        let request = URLRequest.POST(url: url, data: data)
         
         makeRequest(request) { result in
             switch result {
