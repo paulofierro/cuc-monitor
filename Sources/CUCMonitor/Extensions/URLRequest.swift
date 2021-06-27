@@ -7,6 +7,8 @@
 
 import Foundation
 
+typealias Parameters = [String: Any]
+
 extension URLRequest {
     
     /// Returns a POST request
@@ -20,5 +22,32 @@ extension URLRequest {
         }
         
         return request
+    }
+    
+    /// Add URL parameters to a request. Also adds required HTTP headers if these are missing
+    mutating func addURLParameters(_ parameters: Parameters) {
+        guard let url = url else {
+            return
+        }
+
+        if parameters.isNotEmpty {
+            // Add a query item for each param
+            var items = [URLQueryItem]()
+            parameters
+                .sorted(by: {
+                    $0.key < $1.key
+                })
+                .forEach { key, value in
+                    let encodedValue = "\(value)".addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+                    let item = URLQueryItem(name: key, value: encodedValue)
+                    items.append(item)
+                }
+
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            components?.queryItems = items
+
+            // Finally replace our URL
+            self.url = components?.url
+        }
     }
 }
