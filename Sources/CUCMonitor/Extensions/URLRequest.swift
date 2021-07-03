@@ -11,15 +11,10 @@ typealias Parameters = [String: Any]
 
 extension URLRequest {
     /// Returns a POST request and adds the data to the request body
-    static func POST(url: URL, cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy, timeoutInterval: TimeInterval = 60.0, data: Data? = nil) -> URLRequest {
+    static func POST(url: URL, cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy, timeoutInterval: TimeInterval = 60.0) -> URLRequest {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addUserAgent()
-
-        if let data = data {
-            request.httpBody = data
-            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-        }
 
         return request
     }
@@ -71,6 +66,25 @@ extension URLRequest {
 
             // Finally replace our URL
             self.url = components?.url
+        }
+    }
+
+    /// Add a JSON payload to a request. Also adds required HTTP headers if these are missing
+    mutating func addJSONPayload(_ json: JSON?) throws {
+        guard let json = json else {
+            throw EncodingError.noData
+        }
+        do {
+            guard JSONSerialization.isValidJSONObject(json) else {
+                throw EncodingError.encodingFailed
+            }
+
+            httpBody = try JSONSerialization.data(withJSONObject: json)
+
+            // Add the content-type header
+            setValue("application/json", forHTTPHeaderField: "Content-Type")
+        } catch {
+            throw EncodingError.encodingFailed
         }
     }
 }

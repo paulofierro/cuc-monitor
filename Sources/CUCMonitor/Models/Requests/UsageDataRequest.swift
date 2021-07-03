@@ -7,81 +7,64 @@
 
 import Foundation
 
-struct UsageDataRequest {
+struct UsageDataRequest: Encodable {
+    let rollup = "Day"
+    let startDate = "2021-05-24 00:00:00" // TODO Pass this in
+    let endDate = "2021-06-24 00:00:00"   // TODO Pass this in
+    let channel = "KWh"
+    let intialCommodityType = "E"
+    let showCostBar = false
+    let uom = "KWh"
+    let inputParameters: [InputParameter]
     let meterId: String
+
+    enum CodingKeys: String, CodingKey {
+        case rollup, channel, meterId, showCostBar, uom, inputParameters
+        case startDate = "startDtm"
+        case endDate = "endDtm"
+        case intialCommodityType = "forceInitialCommodityTp"
+    }
 
     init(meterId: String) {
         self.meterId = meterId
+        self.inputParameters = [
+            InputParameter(
+                paramId: "DatasetType",
+                isRequired: true,
+                defaultValue: "None",
+                value: "Weather",
+                label: nil
+            ),
+            InputParameter(
+                paramId: "WeatherStation",
+                isRequired: false,
+                defaultValue: "CUC",
+                value: "CUC",
+                label: "Weather Station"
+            ),
+            InputParameter(
+                paramId: "WeatherDataType",
+                isRequired: true,
+                defaultValue: "Temperature",
+                value: "Temperature",
+                label: "Weather Data Type"
+            ),
+            InputParameter(
+                paramId: "WeatherDataUOM",
+                isRequired: true,
+                defaultValue: "C",
+                value: "C",
+                label: nil
+            )
+        ]
     }
 
-    func toData() -> Data? {
-        let bodyObject: [String: Any] = [
-            "rollup": "Day",
-            "startDtm": "2021-05-24 00:00:00", // TODO: Calculate this
-            "endDtm": "2021-06-24 00:00:00",  // TODO: Calculate this
-            "channel": "KWh",
-            "forceInitialCommodityTp": "E",
-            "meterId": "\(meterId)",
-            "showCostBar": false,
-            "inputParameters": [
-                [
-                    "paramId": "DatasetType",
-                    "enumValues": [
-                        "None",
-                        "Weather",
-                        "Register",
-                        "Average"
-                    ],
-                    "isRequired": true,
-                    "defaultValue": "None",
-                    "type": "Enumeration",
-                    "value": "Weather"
-                ],
-                [
-                    "isRequired": false,
-                    "defaultValue": "CUC",
-                    "paramId": "WeatherStation",
-                    "label": "Weather Station",
-                    "type": "Enumeration",
-                    "enumValues": [
-                        "CUC"
-                    ],
-                    "value": "CUC"
-                ],
-                [
-                    "isRequired": true,
-                    "defaultValue": "Temperature",
-                    "paramId": "WeatherDataType",
-                    "label": "Weather Data Type",
-                    "type": "Enumeration",
-                    "enumValues": [
-                        "Temperature",
-                        "Relative Humidity",
-                        "Daily Precipitation",
-                        "Wind Speed"
-                    ],
-                    "value": "Temperature"
-                ],
-                [
-                    "paramId": "WeatherDataUOM",
-                    "enumValues": [
-                        "F",
-                        "C"
-                    ],
-                    "isRequired": true,
-                    "defaultValue": "C",
-                    "type": "Enumeration",
-                    "value": "C"
-                ]
-            ],
-            "uom": "KWh"
-        ]
-
-        do {
-            return try JSONSerialization.data(withJSONObject: bodyObject, options: [])
-        } catch {
-            log.error("Could not serialize JSON: \(error.localizedDescription)")
-        }
-        return nil
+    struct InputParameter: Encodable {
+        let paramId: String
+        let isRequired: Bool
+        let defaultValue: String
+        let type = "Enumeration"
+        let value: String
+        let label: String?
     }
 }

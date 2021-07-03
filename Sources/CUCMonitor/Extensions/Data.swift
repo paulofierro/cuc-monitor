@@ -8,7 +8,6 @@
 import Foundation
 
 extension Data {
-
     // Loads a JSON file from a bundle
     static func loadJSON(from filename: String, bundle: Bundle? = nil) throws -> Data? {
         guard let path = bundle?.path(forResource: filename, ofType: "json") else {

@@ -24,9 +24,7 @@ let package = Package(
         .testTarget(
             name: "CUCMonitorTests",
             dependencies: ["CUCMonitor"],
-            resources: [
-                .copy("Resources")
-            ]
+            resources: []
         )
     ]
 )

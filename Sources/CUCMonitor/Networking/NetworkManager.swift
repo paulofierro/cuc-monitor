@@ -89,10 +89,9 @@ final class NetworkManager {
 
     internal func loadData(meterId: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
         let url = baseURL.appendingPathComponent(usagePath)
-        let request = URLRequest.POST(
-            url: url,
-            data: UsageDataRequest(meterId: meterId).toData()
-        )
+        let payload = UsageDataRequest(meterId: meterId).toJSON()
+        var request = URLRequest.POST(url: url)
+        try? request.addJSONPayload(payload)
 
         makeRequest(request) { result in
             switch result {
