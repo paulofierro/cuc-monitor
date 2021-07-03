@@ -23,7 +23,10 @@ let package = Package(
         ),
         .testTarget(
             name: "CUCMonitorTests",
-            dependencies: ["CUCMonitor"]
+            dependencies: ["CUCMonitor"],
+            resources: [
+                .copy("Resources")
+            ]
         )
     ]
 )
