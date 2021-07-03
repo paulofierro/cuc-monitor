@@ -9,8 +9,8 @@ import Foundation
 
 struct UsageDataRequest: Encodable {
     let rollup = "Day"
-    let startDate = "2021-05-24 00:00:00" // TODO Pass this in
-    let endDate = "2021-06-24 00:00:00"   // TODO Pass this in
+    let startDate: String// "2021-05-24 00:00:00" // TODO Pass this in
+    let endDate: String // = "2021-06-24 00:00:00"   // TODO Pass this in
     let channel = "KWh"
     let intialCommodityType = "E"
     let showCostBar = false
@@ -26,7 +26,25 @@ struct UsageDataRequest: Encodable {
     }
 
     init(meterId: String) {
+        let calendar = Calendar(identifier: .gregorian)
+        let today = Date()
+        let lastMonth = calendar.date(
+            byAdding: .month,
+            value: -1,
+            to: today
+        )
+        self.init(
+            meterId: meterId,
+            startDate: lastMonth ?? today,
+            endDate: today
+        )
+    }
+    
+    init(meterId: String, startDate: Date, endDate: Date) {
         self.meterId = meterId
+        self.startDate = DateFormatter.apiRequestFormatter.string(from: startDate)
+        self.endDate = DateFormatter.apiRequestFormatter.string(from: endDate)
+        
         self.inputParameters = [
             InputParameter(
                 paramId: "DatasetType",

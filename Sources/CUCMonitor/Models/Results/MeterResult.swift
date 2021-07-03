@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MeterResult: Decodable {
+struct MeterResult: Codable {
     let meterId: String
     let channel: String
     let outputUnit: String

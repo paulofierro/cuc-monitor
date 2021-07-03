@@ -87,7 +87,7 @@ final class NetworkManager {
         }
     }
 
-    internal func loadData(meterId: String, completionHandler: @escaping(Result<Void, Error>) -> Void) {
+    internal func loadData(meterId: String, completionHandler: @escaping(Result<DataResult, Error>) -> Void) {
         let url = baseURL.appendingPathComponent(usagePath)
         let payload = UsageDataRequest(meterId: meterId).toJSON()
         var request = URLRequest.POST(url: url)
@@ -95,8 +95,13 @@ final class NetworkManager {
 
         makeRequest(request) { result in
             switch result {
-            case .success:
-                completionHandler(.success(()))
+            case .success(let data):
+                do {
+                    let result = try JSONDecoder().decode(DataResult.self, from: data)
+                    completionHandler(.success(result))
+                } catch {
+                    completionHandler(.failure(error))
+                }
 
             case .failure(let error):
                 completionHandler(.failure(error))

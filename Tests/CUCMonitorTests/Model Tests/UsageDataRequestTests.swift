@@ -4,7 +4,7 @@ import XCTest
 final class UsageDataRequestTests: XCTestCase {
     let meterId = "METER_ID"
 
-    func testJSON() throws {
+    func testEncodingJSON() throws {
         let request = UsageDataRequest(meterId: meterId)
         let json = try request.toJSONString()
         XCTAssertNotNil(json)

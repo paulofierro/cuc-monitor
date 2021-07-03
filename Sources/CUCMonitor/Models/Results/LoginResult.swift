@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct LoginResult: Decodable {
+struct LoginResult: Codable {
     let redirectUrl: String
 }
