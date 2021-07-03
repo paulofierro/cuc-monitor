@@ -30,7 +30,7 @@ extension NetworkError: LocalizedError {
              .notFound(let code),
              .badResponse(let code):
             return "\(self) [\(code)]"
-            
+
         case .invalidResponse:
             return "\(self)"
         }

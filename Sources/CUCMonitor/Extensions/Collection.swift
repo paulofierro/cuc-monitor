@@ -15,7 +15,6 @@ extension Collection {
 }
 
 extension Optional where Wrapped: Collection {
-
     /// Sugar for asking an optional collection if it's both not empty and contains elements
     var isNotEmpty: Bool {
         return !isEmptyOrNil

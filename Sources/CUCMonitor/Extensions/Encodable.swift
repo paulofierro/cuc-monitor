@@ -8,12 +8,11 @@
 import Foundation
 
 extension Encodable {
-
     /// Convert the data to JSON
     func toJSON() throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
-        
+
         let jsonData = try encoder.encode(self)
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw EncodingError.noData

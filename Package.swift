@@ -8,19 +8,22 @@ let package = Package(
     products: [
         .library(
             name: "CUCMonitor",
-            targets: ["CUCMonitor"]),
+            targets: ["CUCMonitor"]
+        )
     ],
     dependencies: [
-        .package(url: "https://github.com/paulofierro/Logger", from: "0.0.1"),
+        .package(url: "https://github.com/paulofierro/Logger", from: "0.0.1")
     ],
     targets: [
         .target(
             name: "CUCMonitor",
             dependencies: [
                 .product(name: "Logger", package: "Logger")
-            ]),
+            ]
+        ),
         .testTarget(
             name: "CUCMonitorTests",
-            dependencies: ["CUCMonitor"]),
+            dependencies: ["CUCMonitor"]
+        )
     ]
 )

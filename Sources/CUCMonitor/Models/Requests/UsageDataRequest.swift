@@ -8,15 +8,14 @@
 import Foundation
 
 struct UsageDataRequest {
-    
     let meterId: String
-    
+
     init(meterId: String) {
         self.meterId = meterId
     }
-    
+
     func toData() -> Data? {
-        let bodyObject: [String : Any] = [
+        let bodyObject: [String: Any] = [
             "rollup": "Day",
             "startDtm": "2021-05-24 00:00:00", // TODO: Calculate this
             "endDtm": "2021-06-24 00:00:00",  // TODO: Calculate this
@@ -77,11 +76,10 @@ struct UsageDataRequest {
             ],
             "uom": "KWh"
         ]
-        
+
         do {
             return try JSONSerialization.data(withJSONObject: bodyObject, options: [])
-        }
-        catch {
+        } catch {
             log.error("Could not serialize JSON: \(error.localizedDescription)")
         }
         return nil

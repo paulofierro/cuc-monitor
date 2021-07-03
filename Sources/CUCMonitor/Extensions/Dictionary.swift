@@ -8,10 +8,10 @@
 import Foundation
 
 protocol URLQueryParameterStringConvertible {
-    var queryParameters: String {get}
+    var queryParameters: String { get }
 }
 
-extension Dictionary : URLQueryParameterStringConvertible {
+extension Dictionary: URLQueryParameterStringConvertible {
     /**
      This computed property returns a query parameters string from the given NSDictionary. For
      example, if the input is @{@"day":@"Tuesday", @"month":@"January"}, the output

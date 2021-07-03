@@ -8,7 +8,6 @@
 import Foundation
 
 extension HTTPURLResponse {
-    
     /// Returns an error if the HTTP response status code maps to an error.
     var statusCodeError: NetworkError? {
         switch statusCode {
